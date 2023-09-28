@@ -1,5 +1,7 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 
 string connectionString = "DefaultEndpointsProtocol=https;AccountName=blobdemostgacc;AccountKey=GvE0EDTpo0H8uko5kBUP+sY13iRbdtVxsP5UAyjK8RT9VHpHiHAcoz7C+s5DFG9/xCszyChLEEbK+AStPq87uw==;EndpointSuffix=core.windows.net";
 string containerName = "scripts";
@@ -15,13 +17,13 @@ BlobClient blobClient1 = new BlobClient(connectionString, containerName, blobNam
 try
 {
     //await SetBlobMetaData();
-    await GetMetaData();
+    //await GetMetaData();
 
     // --------- Create Container ----------
     // var res = await blobServiceClient.CreateBlobContainerAsync(containerName,PublicAccessType.None);
     // Console.WriteLine("Contaienr Created");
-    
-    
+
+
 
     // --------- Upload blob -------
     /*var res = await blobClient.UploadAsync(filePath, true);
@@ -40,6 +42,15 @@ try
     // -------- Downlaod blob ------------
     // var res = await blobClient1.DownloadToAsync(filePath);
     // Console.WriteLine("Blob downloaded successfully.");
+
+
+    // --------- Lease example ----------
+    BlobLeaseClient blobLeaseClient = blobClient.GetBlobLeaseClient();
+    TimeSpan leaseDuration = new TimeSpan(0,0,1,00);
+
+    Response<BlobLease> response = await blobLeaseClient.AcquireAsync(leaseDuration);
+
+    Console.WriteLine($"Lease id is: {response.Value.LeaseId}");
 
     // ----- Set meta Data -------
     async Task SetBlobMetaData()
